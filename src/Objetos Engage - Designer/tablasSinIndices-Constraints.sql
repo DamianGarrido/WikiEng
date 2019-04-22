@@ -1,0 +1,132 @@
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+
+--TABLAS DE ENGAGE QUE NO POSEEN ÍNDICES NI CONSTRAINTS DEL TIPO PRIMARY KEY / UNIQUE ORDENADAS POR TABLE NAME.
+
+CREATE TABLE #T_SININDICES( 
+ID INT IDENTITY (1,1),
+TABLE_NAME VARCHAR(MAX))
+INSERT INTO #T_SININDICES
+	
+	SELECT T1.TABLE_NAME
+	FROM EVI_TABLES T1
+	WHERE TABLESPACE_NAME NOT IN (
+	'ENGAGEDEFAULT_DSST',
+	'ENGAGEDEFAULT_MD',
+	'ENGAGEDEFAULT_SD',
+	'ENGAGEDEFAULT_WKFD')
+	AND TABLE_NAME NOT IN (
+	'EDA_REGISTRO_SUCESOS',
+	'ENGAGELOG',
+	'PHYSICAL_CALL_TRANSACTIONS')
+	AND NOT EXISTS (
+	SELECT 1
+	FROM EVI_TABLE_INDEXES T2
+	WHERE (T2.TABLE_NAME = T1.TABLE_NAME))
+	AND NOT EXISTS (
+	SELECT 1
+	FROM EVI_TABLE_CONSTRAINTS T3
+	INNER JOIN EVI_TABLE_INDEXES T2 ON T3.CONSTRAINT_NAME = T2.INDEX_NAME
+	WHERE T2.INDEX_NAME = T1.TABLE_NAME
+	AND (T3.CONSTRAINT_TYPE IN ('PRIMARY KEY', 'UNIQUE')))
+
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+
+-- CONSULTA LAS TABLAS QUE NO POSEEN INDICES Y/O CONSTRAINTS Y SON UTILIZADAS POR STORE PROCEDURES
+
+SELECT DISTINCT T.TABLE_NAME , E.OBJECT_NAME
+FROM EVI_OBJECT_SOURCES E
+JOIN #T_SININDICES T ON E.OBJECT_SOURCE LIKE '%'+T.TABLE_NAME+'%'
+ORDER BY TABLE_NAME
+
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+
+-- TABLAS QUE NO POSEEN INDICES Y/O CONSTRAINTS DEL TIPO PRIMARY KEY Y SON UTILIZADAS POR STORE PROCEDURES
+
+CREATE TABLE #T_SININDICES_SP(
+ID INT IDENTITY (1,1),
+TABLE_NAME VARCHAR(MAX))
+INSERT INTO #T_SININDICES_SP
+
+	SELECT DISTINCT T.TABLE_NAME
+	FROM EVI_OBJECT_SOURCES E
+	JOIN #T_SININDICES T ON E.OBJECT_SOURCE LIKE '%'+T.TABLE_NAME+'%'
+
+-- ELIMINA LA TABLA #T_SININDICES PARA LA PRÓXIMA EJECUCIÓN
+
+DROP TABLE #T_SININDICES
+
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+
+--CUENTA LA CANTIDAD DE REGISTROS DE UNA TABLA EN PARTICULAR
+
+DECLARE @NOMBRE_TABLA SYSNAME
+SET @NOMBRE_TABLA ='agente' --INGRESE LA TABLA A CONSULTAR
+DECLARE @CONSULTA NVARCHAR (255)
+DECLARE @CANT_REGISTROS INT
+SET @CONSULTA = 'SELECT 1 FROM ' + @NOMBRE_TABLA
+EXEC SP_EXECUTESQL @CONSULTA
+SET @CANT_REGISTROS = @@ROWCOUNT
+CREATE TABLE #REGISTROS_TABLA(
+TABLE_NAME VARCHAR (255),
+REGISTROS INT)
+INSERT INTO #REGISTROS_TABLA (TABLE_NAME, REGISTROS)
+VALUES (@NOMBRE_TABLA, @CANT_REGISTROS)
+SELECT * FROM #REGISTROS_TABLA
+DROP TABLE #REGISTROS_TABLA
+
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+
+--CUENTA LA CANTIDAD DE REGISTROS DE LAS TABLAS QUE CONTIENE #T_SININDICES_SP
+
+DECLARE @NOMBRE_TABLA SYSNAME
+DECLARE @CONSULTA NVARCHAR (255)
+DECLARE @CANT_REGISTROS INT
+DECLARE @CONTADOR INT
+DECLARE @MAX INT
+SET @CONTADOR = 1
+SET @MAX = (SELECT COUNT (1) FROM #T_SININDICES_SP) 
+CREATE TABLE #REGISTROS_TABLA(
+TABLE_NAME VARCHAR (255),
+CANT_REGISTROS INT)
+
+WHILE @CONTADOR <= @MAX
+BEGIN
+
+	SELECT @NOMBRE_TABLA = T2.TABLE_NAME FROM #T_SININDICES_SP T2
+	WHERE ID = @CONTADOR
+	SET @CONSULTA = 'SELECT 1 FROM ' + @NOMBRE_TABLA
+	EXEC SP_EXECUTESQL @CONSULTA
+	SET @CANT_REGISTROS = @@ROWCOUNT
+	SET @CONTADOR = @CONTADOR +1
+	INSERT INTO #REGISTROS_TABLA (TABLE_NAME, CANT_REGISTROS)
+	VALUES (@NOMBRE_TABLA, @CANT_REGISTROS)
+
+END
+
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+
+--MUESTRA EL RESULTADO DEL CONTEO DE LOS REGISTROS DE LAS TABLAS QUE CONTIENE #T_SININDICES_SP
+
+SELECT * FROM #REGISTROS_TABLA
+ORDER BY TABLE_NAME
+
+-- ELIMINA LA TABLA #REGISTROS_TABLA PARA LA PRÓXIMA EJECUCIÓN
+
+DROP TABLE #REGISTROS_TABLA
+
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+
+-- TABLAS DE LA METADATA QUE NO TIENEN ÍNDICES NI CONSTRAINTS DEL TIPO PRIMARY KEY / UNIQUE ORDENADAS POR TABLE NAME.
+
+SELECT ENTITY_TABLE_REL FROM ENTITY_BROWSER
+WHERE ENTITY_TABLE_REL IN (#T_SININDICES)						)
+ORDER BY 1
+
+
