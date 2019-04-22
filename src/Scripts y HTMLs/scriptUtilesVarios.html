@@ -1,0 +1,25 @@
+
+-- Imagen boton con un alerta(pop-up)
+<img src="./../fotos/columbia/faq.png" onclick="alert('¿ESTO E SUN ALERT?');"/>
+
+-- Imagen boton con un alerta(pop-up) y que el largo del mensaje sea mayor al maximo que permite la etiqueta HTML del Designer
+<img src="./../fotos/columbia/faq.png" onclick="alert(texto1+texto2);"/>
+<script>var texto1 = 'Accionistas: Antecedentes - Trayectoria en el negocio - Respaldo - Impresión personal de su capacidad, calidad, trayectoria, profesionalismo, potencial para desarrollar la empresa, ';</script>
+<script>var texto2 = 'dependencia en una o más personas que resultarían difíciles de reemplazar. Toma de decisiones, funciones.';</script> 
+
+
+-- Imagen boton con salto a estructura y confirmación
+'<img src="./../fotos/columbia/edit.gif" width="14" height="14" onclick="SaltoaEstructura(''0000001730_7'');" name="Selecc"/>&nbsp;<img src="./../fotos/columbia/del.gif" width="14" height="14" onclick="confirmar=confirm(''¿Está seguro que desea eliminar el producto?'');if (confirmar){almacenarSeleccion(''PKEYSEL'',''' + 'PKEY' +''');SaltoaEstructura(''0000001931_7'');}" name="Selecc"/>' AS "--",
+
+
+-- Imagen boton con salto y almacenar seleccion en un campo de la tmt
+<img src="./../fotos/columbia/edit.png" style="cursor:pointer" onclick="almacenarSeleccion('ABMSEL','PRODS_OPORTUNIDAD');SaltoaEstructura('0000002281_7');" />
+
+-- ON CHANGE DE UN CAMPO DE TEXTO
+<script>document.getElementsByName('CALL.CUIT:ctl_310')[0].onchange=function(){}</script>
+
+-- INICIAR UNA ACTIVIDAD AL PRESIONAR UN BOTON
+-- Con boton
+<a id="lnkIniciar" style="width: 90px;" class="ovalbutton" href="javascript:StartActivityFromHome('G02','GLOBAL', null);"><span> Reportes Operativos </span></a>
+-- Con Imagen
+<img src="./../fotos/columbia/button_reportes-operativos.png" style="cursor:pointer;" onclick="javascript:StartActivityFromHome('G02','GLOBAL', null);" />
