@@ -1,48 +1,31 @@
-CREATE PROCEDURE [P_CUSTGEN_VALIDAR_CUIT] (@CUIT AS VARCHAR(11), @DOC AS VARCHAR(11), @VALIDADOC AS BIT, @RESULTADO AS BIT OUTPUT) AS
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER OFF
+GO
+CREATE FUNCTION [FN_VALIDAR_CUIT] (@CUIT AS VARCHAR(11)) 
+RETURNS BIT  
 
 -- ============================================================================================
--- Autor: Gabriel Ciapparelli
--- Fecha de creacion: 03/08/2005
--- Ultima modificacion: 03/08/2005
--- Ultima modificacion por: Gabriel Ciapparelli
--- Tablas afectadas de lectura: No Aplican
--- Tablas afectadas de modificacion: No Aplican
 -- Descripcion: Valida si un nro de CUIT pasado por parámetro es válido
 -- Parametros:
 -- @cuit: nro de cuit a validar pasado como varchar(11)
--- @doc:  nro de documento a validar pasado como varchar(11)
--- @validaDoc: campo de tipo bit, si recibe un 1 entonces valida que el cuit contenga el documento
 -- @resultado: devuelve un 0 si la verificación no fue exitosa y un 1 si fue exitosa
 -- ===============================================================================================
-
-SET NOCOUNT ON;
-
+BEGIN
 DECLARE @nroActual             as int
 DECLARE @valor1                as numeric
 DECLARE @valor2                as int
 DECLARE @verificadorObtenido   as int
+DECLARE @resultado			   as bit
 
 -- Chequeo la longitud y que sea numérico para no seguir validando innecesariamente
 
 IF ISNUMERIC(@cuit)=0  OR (NOT(LEN(@cuit)=11))
 BEGIN
-	print('NO ES NUMERICO O BIEN NO TIENE 11 CARACTERES')
 	SET @resultado = 0
 	RETURN 0
 END
 
--- Lo valido contra el nro de documento si la opción viene en verdadero
-
-IF @validaDoc = 1
-BEGIN
-	IF ((SUBSTRING(@cuit,3,8) <> @doc) AND (SUBSTRING(@cuit,4,7) <> @doc))
-   	BEGIN
-		print('EL DATO NO COINCIDE CON EL DOCUMENTO')
-		SET @resultado = 0
-		RETURN 0
-	END
-END
-	
 -- Si pasa entonces uso algoritmo de dígito verificador para Argentina
 
 SET @valor1   = 0
@@ -91,3 +74,8 @@ ELSE BEGIN
 	SET @resultado = 0;
 	RETURN 0;
 END;
+
+RETURN @resultado
+
+END
+GO
