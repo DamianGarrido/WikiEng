@@ -9,7 +9,7 @@ RETURNS BIT
 -- Descripcion: Valida si un nro de CUIT pasado por parámetro es válido
 -- Parametros:
 -- @cuit: nro de cuit a validar pasado como varchar(11)
--- @resultado: devuelve un 0 si la verificación no fue exitosa y un 1 si fue exitosa
+-- @resultado: devuelve un 1 si la verificación no fue exitosa y un 0 si fue exitosa
 -- ===============================================================================================
 BEGIN
 DECLARE @nroActual             as int
@@ -22,8 +22,8 @@ DECLARE @resultado			   as bit
 
 IF ISNUMERIC(@cuit)=0  OR (NOT(LEN(@cuit)=11))
 BEGIN
-	SET @resultado = 0
-	RETURN 0
+	SET @resultado = 1
+	RETURN 1
 END
 
 -- Si pasa entonces uso algoritmo de dígito verificador para Argentina
@@ -67,12 +67,12 @@ IF  @verificadorObtenido <> 0 SET @verificadorObtenido = 11 - @verificadorObteni
 
 IF @verificadorObtenido = CONVERT(int,(SUBSTRING(@cuit,11,1)))
 BEGIN
-	SET @resultado = 1;
+	SET @resultado = 0;
 	RETURN 0;
 END
 ELSE BEGIN
-	SET @resultado = 0;
-	RETURN 0;
+	SET @resultado = 1;
+	RETURN 1;
 END;
 
 RETURN @resultado

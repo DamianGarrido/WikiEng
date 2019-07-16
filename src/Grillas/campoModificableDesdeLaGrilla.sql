@@ -7,4 +7,4 @@ SELECT
 
 FROM TABLA T
 
--- El salto a sstructura tiene que ir a una transaccion que haga un UPDATE a la tabla a modificar con el nuevo valor.
+-- El salto a estructura tiene que ir a una transaccion que haga un UPDATE a la tabla a modificar con el nuevo valor.
