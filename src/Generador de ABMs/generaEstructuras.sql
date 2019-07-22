@@ -9,7 +9,7 @@
 DECLARE @CALL_TYPE_CODE VARCHAR(20), @ABM_NAME VARCHAR(50)
 
 SET @CALL_TYPE_CODE = 'CODIGO_DE_ACTIVIDAD' 
-SET @ABM_NAME = 'NOMBRE DEL ABM' 
+SET @ABM_NAME = 'NOMBRE DEL ABM'
 
 -- ==============================================================
 -- GENERACION
