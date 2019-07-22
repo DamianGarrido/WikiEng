@@ -1,0 +1,30 @@
+﻿-- ==============================================================
+-- GENERA SPs y SUS TRANSACCIONES NECESARIAS PARA EL ABM
+-- ==============================================================
+
+-- ==============================================================
+-- CONFIGURACION
+-- ==============================================================
+DECLARE @CALL_TYPE_CODE VARCHAR(20), @ABM_NAME VARCHAR(50), @ABM_CODE VARCHAR(20)
+
+SET @CALL_TYPE_CODE = 'CODIGO_DE_ACTIVIDAD' 
+SET @ABM_NAME = 'ABM Name'
+SET @ABM_CODE = 'ABM_CODE'
+
+-- ==============================================================
+-- GENERACION
+-- ==============================================================
+DECLARE @PKEY VARCHAR(20), @CONV_STRUCTURE_SEQ NUMERIC(15,0),@PKEY_CALL_TYPE VARCHAR(20), @PKEY_SP_PRM_IN VARCHAR(20)
+
+-- Obtengo PKEY de la Actividad
+SELECT @PKEY_CALL_TYPE = PKEY FROM CALL_TYPE WHERE CALL_TYPE_CODE = @CALL_TYPE_CODE 
+
+-- Nuevo SP
+EXEC PA_SYS_OBTIENE_PKEY 'STORED_PROCEDURES',@PKEY OUT
+INSERT INTO STORED_PROCEDURES (PKEY, TS_BEGIN, TS_END, TS_USER_ID, RETURN_CODE_IDR,SP_CODE,PAR_KEY,SP_NAME,SP_TYPE_CODE,SP_TIME_OUT,SP_TYPE_IDR,SP_DSN, SP_UID,SP_PWD,LOCAL_IDR,SP_OBLIG,SP_CHECK,SP_DISPONIBLE,ENTIDAD_IDR, SP_DESCRIPCION)
+VALUES ( @PKEY, GetDate() , GetDate() ,'ADMINISTRADOR','0','GEN_GR_'+UPPER(@ABM_CODE),@PKEY_CALL_TYPE,'GEN_GR_'+UPPER(@ABM_CODE),@CALL_TYPE_CODE,5,'Atencion',' ',' ',' ','1','N',0,'0','0', 'GEN -  Grilla '+@ABM_NAME)
+
+-- Parámetros de Entrada del SP Nuevo
+EXEC PA_SYS_OBTIENE_PKEY 'SP_PRM_IN',@PKEY_SP_PRM_IN OUT
+INSERT INTO SP_PRM_IN (PKEY, TS_BEGIN, TS_END, PAR_KEY, TS_USER_ID, SP_CODE, PRM_TYPE, PRM_SUBTYPE, PRM_VAL, PRM_CODE,PRM_DESDE,PRM_HASTA,PRM_INDEX,PRM_DATA_TYPE,PRM_LENGTH,PRM_NAME) 
+VALUES ( @PKEY_SP_PRM_IN, GetDate() , GetDate() ,@PKEY,'ADMINISTRACION','GEN_GR_'+UPPER(@ABM_CODE),'Variable','Atributo fijo (Proceso)','ATT.JOB_PKEY','P_PKEY_JOB',1,100,1,'200',100,'P_PKEY_JOB')
