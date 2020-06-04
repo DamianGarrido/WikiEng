@@ -11,7 +11,12 @@
 
 <input id='btn_empezar' type="button" value="Empezar" onclick="empezarDetener(this);">
 
+	
+// BTN RESTART
+	
+<input id='btn_reiniciar' type="button" value="Reiniciar" onclick="reiniciar(this);">	
 
+	
 // IFRAME BTN V1
 
 <input id='btn_siguiente' type="button" value="Siguiente" onclick="window.parent.parent.document.getElementById('btn_empezar').click();">
@@ -24,11 +29,12 @@
 
 // IFRAME BTN V3 TODO: Para que no haya que usar el botón btn_empezar
 
-
 // JS FUNCTIONS PARAMETER
 
 PS_CRONOMETRO:='<script type="text/javascript">'||
-    'var inicio=0;
+    '
+	//var inicio=0;
+    var inicio=new Date().getTime();
     var timeout=0;
  
     function empezarDetener(elemento)
@@ -40,8 +46,7 @@ PS_CRONOMETRO:='<script type="text/javascript">'||
             elemento.value="Detener";
  
             // Obtenemos el valor actual
-			//inicio=0
-            inicio=vuelta=new Date().getTime();
+            inicio=new Date().getTime();
  
             // iniciamos el proceso
             funcionando();
@@ -54,6 +59,20 @@ PS_CRONOMETRO:='<script type="text/javascript">'||
         }
     }
  
+
+    function reiniciar(elemento)
+    {
+            // detemer el cronometro
+            clearTimeout(timeout);
+            timeout=0;
+		
+	     // Obtenemos el valor actual
+            inicio=new Date().getTime();
+		
+	    // iniciamos el proceso
+            funcionando();
+    }
+
     function funcionando()
     {
         // obteneos la fecha actual
