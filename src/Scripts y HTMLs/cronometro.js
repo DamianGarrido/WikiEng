@@ -95,6 +95,6 @@ PS_CRONOMETRO:='<script type="text/javascript">'||
     }
     </script>
  
-    <style>
-    .crono_wrapper {text-align:center;width:200px;}
-    </style>'
+     <style>
+    .crono_wrapper {text-align:center;color:azure;font-family:cursive;background:lightskyblue;width:125px;}
+	</style>'
