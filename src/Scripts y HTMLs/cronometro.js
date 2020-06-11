@@ -7,9 +7,9 @@
 <div class="crono_wrapper">	<h2 id='crono'>00:00:00</h2></div>
 
 	
-// En caso que la pantalla se actualice usar este script para obtener el tiempo actual del cronometro
+// Script para blanquear el localStorage al inicializar el trámite
 	
-<script>document.getElementById("crono").innerHTML = window.localStorage.getItem("tiempoGuardado");</script>
+<script>window.localStorage.setItem("tiempoInicio",0);window.localStorage.setItem("tiempoFinal",0);Continuar();</script>
 
 
 // BTN START/STOP
@@ -39,10 +39,27 @@
 
 PS_CRONOMETRO:='<script type="text/javascript">'||
     '
-    //var inicio=0;
-    var inicio=new Date().getTime();
+   // var inicio=  (localStorage.getItem("tiempoInicio") == 0) ? new Date().getTime() : localStorage.getItem("tiempoInicio");
+    var inicio=0;
     var timeout=0;
+	
+	function inicializar()
+	{
+		var actual = (localStorage.getItem("tiempoFinal") == 0) ? new Date().getTime() : localStorage.getItem("tiempoFinal");
+		
+		inicio=  (localStorage.getItem("tiempoInicio") == 0) ? new Date().getTime() : localStorage.getItem("tiempoInicio");
+		
+        // Obtenemos la diferencia entre la fecha actual y la de inicio
+        var diff=new Date(actual-inicio);
  
+        // Formateamos el tiempo a mostrar HH:MM:SS
+        var result=LeadingZero(diff.getUTCHours())+":"+LeadingZero(diff.getUTCMinutes())+":"+LeadingZero(diff.getUTCSeconds());
+	    
+		// Seteamos el tiempo a mostrar
+        document.getElementById(''crono'').innerHTML = result;
+	}
+	
+	
     function empezarDetener(elemento)
     {
         if(timeout==0)
@@ -53,7 +70,10 @@ PS_CRONOMETRO:='<script type="text/javascript">'||
  
             // Obtenemos el valor actual
             inicio=new Date().getTime();
- 
+			
+			// En caso que la pantalla vaya a refrescarse se guarda el tiempo de inicio del cronómetro
+			localStorage.setItem("tiempoInicio", inicio);
+			
             // Iniciamos el cronometro
             funcionando();
         }else{
@@ -75,6 +95,9 @@ PS_CRONOMETRO:='<script type="text/javascript">'||
 	     // Obtenemos el valor actual
             inicio=new Date().getTime();
 		
+		// En caso que la pantalla vaya a refrescarse se guarda el tiempo de inicio del cronómetro
+			localStorage.setItem("tiempoInicio", inicio);
+		
 	    // Iniciamos el cronometro
             funcionando();
     }
@@ -90,12 +113,12 @@ PS_CRONOMETRO:='<script type="text/javascript">'||
         // Formateamos el tiempo a mostrar HH:MM:SS
         var result=LeadingZero(diff.getUTCHours())+":"+LeadingZero(diff.getUTCMinutes())+":"+LeadingZero(diff.getUTCSeconds());
 	    
-	// Seteamos el tiempo a mostrar
+		// Seteamos el tiempo a mostrar
         document.getElementById(''crono'').innerHTML = result;
- 	
-	// En caso que la pantalla vaya a refrescarse se guarda el tiempo actual del cronómetro
-	localStorage.setItem("tiempoGuardado", result);
-	    
+ 		
+		// En caso que la pantalla vaya a refrescarse se guarda el tiempo de inicio del cronómetro
+			localStorage.setItem("tiempoFinal", actual);
+			
         // Indicamos que se ejecute esta función nuevamente dentro de 1 segundo
         timeout=setTimeout("funcionando()",1000);
     }
@@ -107,5 +130,5 @@ PS_CRONOMETRO:='<script type="text/javascript">'||
     </script>
  	
      <style>
-    .crono_wrapper {text-align:center;color:azure;font-family:cursive;background:lightskyblue;width:125px;}
+    .crono_wrapper {text-align:center;color:azure;font-family:cursive;background:lightskyblue;width:125px;border-radius: 10px;}
 	</style>'
